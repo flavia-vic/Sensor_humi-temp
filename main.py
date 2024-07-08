@@ -9,8 +9,8 @@ sensor = dht.DHT11(Pin(4))
 
 # Função para conectar à rede Wi-Fi
 def connect_wifi():
-    ssid = 'Daileon 2G'
-    password = 'sMimouzinho123'
+    ssid = 'SEU_NOME_WIFI'
+    password = 'SUA_SENHA_WIFI'
     station = network.WLAN(network.STA_IF)
     station.active(True)
     station.connect(ssid, password)
@@ -37,7 +37,7 @@ def read_sensor():
 
 # Função para enviar dados para a API
 def send_data(temperature, humidity, date_time):
-    url = "http://192.168.1.10:5000/add"
+    url = "http://LOCALHOST:5000/add"
     data = {
         "temperature": temperature,
         "humidity": humidity,
