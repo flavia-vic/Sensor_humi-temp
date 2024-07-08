@@ -10,11 +10,11 @@ import urequests as requests
 sensor = dht.DHT11(machine.Pin(4))  
 
 # Configuração da rede Wi-Fi 
-SSID = "Daileon 2G"
-PASSWORD = "Mimouzinho123"
+SSID = "SEU_NOME_WIFI"
+PASSWORD = "SUA_SENHA_WIFI"
 
 # URL da API
-api_url = 'http://192.168.1.10:9898/add'
+api_url = 'http://LOCALHOST:9898/add'
 headers = {'Content-Type': 'application/json'}
 
 # Função para conectar à rede Wi-Fi
