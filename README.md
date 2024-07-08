@@ -43,3 +43,7 @@ CREATE TABLE sensor_data (
 - Todos Os dados podem ser acessados na rota 'GET  /data'
 - a pesquisa tambem pode ser feita por id em 'GET  /data/id
 - Para testar endpoints podem ser usadas ferramentes como Insomnia e Postman
+
+
+### conexaão sensor com ESP
+![pinos conectados a ESP8266 e o sensor](https://github.com/flavia-vic/Sensor_humi-temp/blob/main/espwithsensor.jpg?raw=true)
