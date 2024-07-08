@@ -22,7 +22,7 @@ Este projeto é um sistema de Internet das Coisas (IoT) projetado para monitorar
 - Biblioteca python para requests
 
 ## Instruções de configuração
-- Flash MicroPython no ESP8266
+- Flash MicroPython na ESP8266
 - Enviar main.py para ESP usando ampy. ex:
 ampy --port /dev/ttyUSB0 put main.py(assumindo que sua porta ultilizada seja a ttyUSB0)
 - Executar o main.py no ESP. ex:
