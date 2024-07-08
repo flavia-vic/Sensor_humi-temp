@@ -1,47 +1,67 @@
-import dht
-import machine
-import time
-import utime
 import network
-import ntptime
+import urequests
+import time
+from machine import Pin
+import dht
 
-# Configura o pino GPIO4 (D2) como entrada para o sensor
-sensor = dht.DHT11(machine.Pin(4))  
-
-# Configuração da rede Wi-Fi 
-SSID = "Daileon 2G"
-PASSWORD = "Mimouzinho123"
+# Configuração do sensor
+sensor = dht.DHT11(Pin(4))
 
 # Função para conectar à rede Wi-Fi
 def connect_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    if not wlan.isconnected():
-        print('Conectando à rede Wi-Fi...')
-        wlan.connect(SSID, PASSWORD)
-        while not wlan.isconnected():
-            pass
-    print('Conectado com sucesso à rede Wi-Fi')
-    print('Configurando hora via NTP...')
-    ntptime.settime()
-    print('Hora configurada com sucesso via NTP')
+    ssid = 'Daileon 2G'
+    password = 'sMimouzinho123'
+    station = network.WLAN(network.STA_IF)
+    station.active(True)
+    station.connect(ssid, password)
+    while not station.isconnected():
+        pass
+    print("Conectado com sucesso à rede Wi-Fi")
 
-# Conecta à rede Wi-Fi
+# Função para configurar a hora via NTP
+def set_time_ntp():
+    import ntptime
+    ntptime.settime()
+    print("Hora configurada com sucesso via NTP")
+
+# Função para ler o sensor
+def read_sensor():
+    try:
+        sensor.measure()
+        temperature = sensor.temperature()
+        humidity = sensor.humidity()
+        return temperature, humidity
+    except OSError as e:
+        print("Failed to read sensor.")
+        return None, None
+
+# Função para enviar dados para a API
+def send_data(temperature, humidity, date_time):
+    url = "http://192.168.1.10:5000/add"
+    data = {
+        "temperature": temperature,
+        "humidity": humidity,
+        "time": date_time
+    }
+    headers = {'Content-Type': 'application/json'}
+    response = urequests.post(url, json=data, headers=headers)
+    print("Dados JSON:", data)
+    print("Resposta da API:", response.json())
+
+# Conectando ao Wi-Fi
 connect_wifi()
 
+# Configurando hora via NTP
+set_time_ntp()
+
+# Loop principal para enviar dados a cada 1 hora
 while True:
-    try:
-        sensor.measure()  # Mede a temperatura e umidade
-        temp = sensor.temperature()  # Obtém a temperatura
-        hum = sensor.humidity()  # Obtém a umidade
-
-        # Obtém a hora local atual
-        current_time = utime.localtime()
-        formatted_time = '{:02}:{:02}:{:02}'.format(current_time[3], current_time[4], current_time[5])
-
-        print('Time: {}, Temperature: {}°C, Humidity: {}%'.format(formatted_time, temp, hum))
-
-    except OSError as e:
-        print('Failed to read sensor.')
-
-    time.sleep(2)  # Aguarda 2 segundos antes da próxima leitura
+    temperature, humidity = read_sensor()
+    if temperature is not None and humidity is not None:
+        current_time = time.localtime()
+        date_time = "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+            current_time[0], current_time[1], current_time[2],
+            current_time[3], current_time[4], current_time[5]
+        )
+        send_data(temperature, humidity, date_time)
+    time.sleep(3600)  # Esperar 1 hora (3600 segundos) antes de enviar os dados novamente
